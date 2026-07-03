@@ -45,6 +45,7 @@ export default function Home() {
 
     setIsLoading(true);
 
+    // Matches everything required to properly populate your image layout
     const data = {
       employeeName: "Ephrem Awulachew",
       branch: "Head Office",
@@ -53,6 +54,10 @@ export default function Home() {
       reason: "System Support",
       date,
       customer,
+      approvedBy: "Manager",
+      time: "14:00 (Afternoon)",
+      companyName: "CNET Software Technologies PLC",
+      documentNo: "CNET-PM-001"
     };
 
     try {
