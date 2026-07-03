@@ -1,65 +1,168 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState } from "react";
+
+const CUSTOMER_LIST = [
+  "ALEM CINEMA",
+  "AWLO BUSINESS CENTER",
+  "CENTURY MALL",
+  "CENTURY ADDIS REAL ESTATE PLC",
+  "DEMBEL CITY CENTER",
+  "GETU GELETE",
+  "LAPTHO MALL",
+  "POWER CINEMA ADDIS",
+  "ELIANA MALL",
+  "CBE CINEMA",
+  "D AFRIQUE TRADING PLC",
+  "HAGER FIKIR THEATRE",
+  "BOSTON DAY AND SPA",
+  "GAST SOLAR MECHANICS PLC",
+  "NEGA BONGER SEID",
+  "CHILDREN AND YOUTH THEATRE",
+  "ETHIOPIAN NATIONAL THEATRE",
+  "ENTERTAINMENTS ALIANCE PLC",
+  "BOLE BESHALE CONSTRACTION RESIDENCE HOUSE OWNERS",
+  "EXHIBITION CENTER AND MARKET DEVELOPMENET ENTERPRIS",
+  "WORKU ZELEKE TREADING",
+  "DAAYO PHYSICAL FITNESS PLC",
+  "MEKONNEN BITEW CINEMA",
+  "KEBRON GUEST HOUSE",
+  "ETHIOPIAN POSTAL SERVICE ENTERPRISE MAIN SERVICE",
+];
 
 export default function Home() {
+  const [date, setDate] = useState("");
+  const [customer, setCustomer] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
+
+  const submitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!date || !customer) {
+      setNotification("Please select both a date and a customer.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const data = {
+      employeeName: "Ephrem Awulachew",
+      branch: "Head Office",
+      address: "Addis Ababa",
+      session: "Afternoon",
+      reason: "System Support",
+      date,
+      customer,
+    };
+
+    try {
+      const res = await fetch("/api/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        setNotification("Exit request submitted successfully! 🚀");
+        setDate("");
+        setCustomer("");
+      } else {
+        setNotification("Failed to send request. Please try again.");
+      }
+    } catch (error) {
+      setNotification("An error occurred. Please check your connection.");
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setNotification(null), 4000);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+      {notification && (
+        <div className="fixed top-4 right-4 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg text-sm z-50 transition-all">
+          {notification}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      )}
+
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 w-full max-w-md">
+        <div className="text-center mb-6">
+          <h1 className="text-xl font-bold text-slate-900">Office Exit Request</h1>
+          <p className="text-xs text-slate-500 mt-1">Submit your schedule details below.</p>
+        </div>
+
+        <form onSubmit={submitForm} className="space-y-4">
+          <Input label="Employee Name" value="Ephrem Awulachew" disabled />
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              Customer / Project
+            </label>
+            <select
+              required
+              className="w-full border border-slate-300 p-2.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-slate-900"
+              value={customer}
+              onChange={(e) => setCustomer(e.target.value)}
+            >
+              <option value="" disabled>Select a customer...</option>
+              {CUSTOMER_LIST.map((item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Branch" value="Head Office" disabled />
+            <Input label="Address" value="Addis Ababa" disabled />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Session" value="Afternoon" disabled />
+            <Input label="Reason" value="System Support" disabled />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              Date
+            </label>
+            <input
+              type="date"
+              required
+              className="w-full border border-slate-300 p-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-slate-900"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full mt-2 bg-red-600 text-white p-3 rounded-lg text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
           >
-            Documentation
-          </a>
-        </div>
-      </main>
+            {isLoading ? "Sending Request..." : "Submit to Telegram"}
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+}
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+}
+
+function Input({ label, ...props }: InputProps) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+        {label}
+      </label>
+      <input
+        className="w-full border border-slate-300 p-2.5 rounded-lg text-sm bg-white text-slate-900 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:cursor-not-allowed"
+        {...props}
+      />
     </div>
   );
 }
