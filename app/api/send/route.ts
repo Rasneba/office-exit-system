@@ -202,7 +202,6 @@ export async function POST(request: Request) {
     
     const blob = new Blob([new Uint8Array(imageBuffer)], { type: "image/png" });
     formData.append("photo", blob, "exit-request.png");
-    formData.append("caption", `📄 *New Red Cloud Office Exit Form Generated for ${customer}*`);
 
     const telegramUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
     const response = await fetch(telegramUrl, {
