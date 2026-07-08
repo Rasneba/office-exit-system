@@ -33,6 +33,7 @@ const CUSTOMER_LIST = [
 export default function Home() {
   const [date, setDate] = useState("");
   const [customer, setCustomer] = useState("");
+  const [session, setSession] = useState("FULLDAY");
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -49,9 +50,9 @@ export default function Home() {
       employeeName: "Ephrem Awulachew",
       branch: "Head Office",
       address: "Addis Ababa",
-      session: "FULLDAY",
+      session,
       reason: "System Support",
-      Manager : "hawariat",
+      manager: "Hawariat",
       date,
       customer,
     };
@@ -70,7 +71,7 @@ export default function Home() {
       } else {
         setNotification("Failed to send request. Please try again.");
       }
-    } catch (error) {
+    } catch {
       setNotification("An error occurred. Please check your connection.");
     } finally {
       setIsLoading(false);
@@ -120,7 +121,21 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Session" value="FULLDAY" disabled />
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                Session
+              </label>
+              <select
+                required
+                className="w-full border border-slate-300 p-2.5 rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white text-slate-900"
+                value={session}
+                onChange={(e) => setSession(e.target.value)}
+              >
+                <option value="FULLDAY">Full Day</option>
+                <option value="HALFDAY_MORNING">Half Day (Morning)</option>
+                <option value="HALFDAY_AFTERNOON">Half Day (Afternoon)</option>
+              </select>
+            </div>
             <Input label="Reason" value="System Support" disabled />
           </div>
 
