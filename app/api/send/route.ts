@@ -192,7 +192,7 @@ export async function POST(request: Request) {
     };
 
     try {
-      const chromium = await import("@sparticuz/chromium-min").then(m => m.default);
+      const chromium = await import("@sparticuz/chromium").then(m => m.default);
       puppeteerMod = await import("puppeteer-core");
       launchArgs = {
         args: chromium.args,
