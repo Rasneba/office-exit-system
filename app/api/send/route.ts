@@ -191,14 +191,18 @@ export async function POST(request: Request) {
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     };
 
-    try {
-      const chromium = await import("@sparticuz/chromium").then(m => m.default);
-      puppeteerMod = await import("puppeteer-core");
-      launchArgs = {
-        args: chromium.args,
-        executablePath: await chromium.executablePath(),
-      };
-    } catch {
+    if (process.platform === "linux") {
+      try {
+        const chromium = await import("@sparticuz/chromium").then(m => m.default);
+        puppeteerMod = await import("puppeteer-core");
+        launchArgs = {
+          args: chromium.args,
+          executablePath: await chromium.executablePath(),
+        };
+      } catch {
+        puppeteerMod = await import("puppeteer");
+      }
+    } else {
       puppeteerMod = await import("puppeteer");
     }
 
