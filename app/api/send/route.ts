@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import nodeHtmlToImage from "node-html-to-image";
-import puppeteer from "puppeteer";
 
 export async function POST(request: Request) {
   try {
@@ -186,14 +185,28 @@ export async function POST(request: Request) {
     </html>
     `;
 
-    // 2. Render HTML directly into binary buffer via Puppeteer instance hook
+    // 2. Configure puppeteer for current environment (Vercel serverless vs local)
+    let puppeteerMod: unknown;
+    let launchArgs: Record<string, unknown> = {
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    };
+
+    try {
+      const chromium = await import("@sparticuz/chromium-min").then(m => m.default);
+      puppeteerMod = await import("puppeteer-core");
+      launchArgs = {
+        args: chromium.args,
+        executablePath: await chromium.executablePath(),
+      };
+    } catch {
+      puppeteerMod = await import("puppeteer");
+    }
+
     const imageBuffer = (await nodeHtmlToImage({
       html: htmlContent,
       type: "png",
-      puppeteer: puppeteer, 
-      puppeteerArgs: {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      },
+      puppeteer: puppeteerMod,
+      puppeteerArgs: launchArgs,
     })) as Buffer;
 
     // 3. Dispatch payload out to Telegram API configuration endpoints
