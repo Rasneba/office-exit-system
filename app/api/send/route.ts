@@ -8,12 +8,14 @@ export async function POST(request: Request) {
     const { 
       date, 
       customer, 
+      session,
+      manager,
       employeeName = "Ephrem Awulachew", 
-      branch = "Bole", 
+      branch = "Head Office", 
       address = "Addis Ababa", 
-      reason = "Network support", 
-      approvedBy = "Hawariat Tenu", // Can now be completely customized from client requests
-      time = "Full Day",           // Can now be completely customized from client requests
+      reason = "System Support", 
+      approvedBy = manager || "Hawariat Tenu",
+      time = session === "FULLDAY" ? "Full Day" : session === "HALFDAY_MORNING" ? "Half Day (Morning)" : session === "HALFDAY_AFTERNOON" ? "Half Day (Afternoon)" : session || "Full Day",
       companyName = "Red Cloud ICT Solutions PLC", 
       documentNo = "OF/RED/HRM/001" 
     } = body;

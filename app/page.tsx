@@ -52,7 +52,7 @@ export default function Home() {
       address: "Addis Ababa",
       session,
       reason: "System Support",
-      manager: "Hawariat",
+      approvedBy: "Hawariat Tenu",
       date,
       customer,
     };
