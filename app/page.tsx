@@ -45,19 +45,15 @@ export default function Home() {
 
     setIsLoading(true);
 
-    // Matches everything required to properly populate your image layout
     const data = {
       employeeName: "Ephrem Awulachew",
       branch: "Head Office",
       address: "Addis Ababa",
-      session: "Afternoon",
+      session: "FULLDAY",
       reason: "System Support",
+      Manager : "hawariat",
       date,
       customer,
-      approvedBy: "Manager",
-      time: "14:00 (Afternoon)",
-      companyName: "CNET Software Technologies PLC",
-      documentNo: "CNET-PM-001"
     };
 
     try {
@@ -124,7 +120,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Session" value="Afternoon" disabled />
+            <Input label="Session" value="FULLDAY" disabled />
             <Input label="Reason" value="System Support" disabled />
           </div>
 

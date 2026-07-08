@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
-import puppeteerCore from "puppeteer-core";
-import chromium from "@sparticuz/chromium-min";
-
-// Official lightweight remote binary matching standard Vercel requirements
-const CHROMIUM_PACK_URL = "https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar";
+import nodeHtmlToImage from "node-html-to-image";
+import puppeteer from "puppeteer";
 
 export async function POST(request: Request) {
   try {
@@ -15,8 +12,8 @@ export async function POST(request: Request) {
       branch = "Bole", 
       address = "Addis Ababa", 
       reason = "Network support", 
-      approvedBy = "Hawariat Tenu", 
-      time = "Full Day",           
+      approvedBy = "Hawariat Tenu", // Can now be completely customized from client requests
+      time = "Full Day",           // Can now be completely customized from client requests
       companyName = "Red Cloud ICT Solutions PLC", 
       documentNo = "OF/RED/HRM/001" 
     } = body;
@@ -28,12 +25,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing API configuration tokens." }, { status: 500 });
     }
 
+    // 1. Generate updated blueprint layout mirroring the Red Cloud form (image_ec8ae9.png)
     const htmlContent = `
     <html>
       <head>
         <style>
-          body { font-family: Arial, sans-serif; width: 900px; padding: 15px; background-color: #fff; color: #000; margin: 0; }
+          body { font-family: Arial, Helvetica, sans-serif; width: 900px; padding: 15px; background-color: #fff; color: #000; margin: 0; }
           .border-box { border: 1px solid #444; padding: 0px; }
+          
+          /* Header Layout */
           .header-table { width: 100%; border-collapse: collapse; }
           .header-table td { border: 1px solid #444; padding: 6px 12px; vertical-align: top; }
           .logo-box { text-align: center; vertical-align: middle !important; width: 12%; }
@@ -41,21 +41,31 @@ export async function POST(request: Request) {
           .logo-subtext { font-size: 9px; color: #555; }
           .meta-label { font-size: 10px; color: #666; display: block; margin-bottom: 2px; }
           .meta-value { font-size: 12px; font-weight: bold; }
+          
+          /* Industry Layout Grid with stacked right-side columns */
           .industry-container { display: flex; padding: 15px; font-size: 11px; border-bottom: 1px solid #444; }
           .industry-left { width: 85%; }
           .industry-right { width: 15%; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; }
           .industry-title { font-weight: bold; font-size: 12px; text-align: center; margin-bottom: 10px; width: 100%; }
           .industry-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-right: 20px; }
           .industry-item { width: 48%; display: flex; justify-content: space-between; align-items: center; }
-          .indicator-box { width: 45px; height: 22px; border: 1px solid #444; border-radius: 6px; background: linear-gradient(to bottom, #f2f2f2, #d9d9d9); margin-bottom: 4px; }
+          
+          /* Red Cloud Box Indicators styling */
+          .indicator-box { width: 45px; height: 22px; border: 1px solid #444; border-radius: 6px; background: linear-gradient(to bottom, #f2f2f2, #d9d9d9); box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 4px; }
           .indicator-box.active { background: #b30000; border-color: #b30000; }
           .checkbox-square { width: 24px; height: 18px; border: 1px solid #444; border-radius: 4px; background: linear-gradient(to bottom, #f9f9f9, #e6e6e6); display: inline-block; }
+          
+          /* Section Labels */
           .section-heading { font-weight: bold; font-size: 12px; padding: 12px 15px 4px 15px; }
           .date-line { padding: 0px 15px 15px 15px; font-size: 12px; border-bottom: 1px solid #444; }
           .underline-span { border-bottom: 1px solid #000; padding: 0 40px; font-weight: bold; }
+
+          /* Main Manifest Table Data Grid */
           .data-table { width: 100%; border-collapse: collapse; }
           .data-table th { background-color: #b30000; color: white; font-size: 11px; font-weight: bold; padding: 8px; border: 1px solid #444; text-align: left; }
           .data-table td { padding: 10px 8px; border: 1px solid #444; font-size: 12px; color: #111; }
+          
+          /* Footer block signatures styling */
           .footer-signatures { display: flex; justify-content: space-between; padding: 30px 60px 15px 60px; font-size: 12px; }
           .signature-section { width: 250px; }
           .sig-title { font-weight: bold; text-decoration: underline; display: block; margin-bottom: 8px; }
@@ -64,6 +74,7 @@ export async function POST(request: Request) {
       </head>
       <body>
         <div class="border-box">
+          <!-- Header Structure Matrix Layout -->
           <table class="header-table">
             <tr>
               <td class="logo-box" rowspan="2">
@@ -98,6 +109,7 @@ export async function POST(request: Request) {
             </tr>
           </table>
 
+          <!-- 1. Industry Name Categorization layout framework -->
           <div class="industry-title" style="margin-top: 10px;">1. Industry Name:</div>
           <div class="industry-container">
             <div class="industry-left">
@@ -114,6 +126,7 @@ export async function POST(request: Request) {
                 <div class="industry-item"><span><b>1.6.</b> Merchandizing Projects Management Division</span> <span class="checkbox-square"></span></div>
               </div>
             </div>
+            <!-- Stacked Status Alert Blocks matching right sidebar from image_ec8ae9.png -->
             <div class="industry-right">
               <div class="indicator-box active"></div>
               <div class="indicator-box"></div>
@@ -121,11 +134,13 @@ export async function POST(request: Request) {
             </div>
           </div>
 
+          <!-- 2. Office Exit Section Parameters -->
           <div class="section-heading">2. Office Exit:</div>
           <div class="date-line">
             <b>2.1.1.</b> Date: <span class="underline-span">&nbsp;&nbsp;${date}&nbsp;&nbsp;</span>
           </div>
 
+          <!-- Main Manifest Dynamic Grid -->
           <table class="data-table">
             <thead>
               <tr>
@@ -151,6 +166,7 @@ export async function POST(request: Request) {
             </tbody>
           </table>
 
+          <!-- Signatures Footer -->
           <div class="footer-signatures">
             <div class="signature-section">
               <span class="sig-title">Requested By (Employee)</span>
@@ -161,46 +177,28 @@ export async function POST(request: Request) {
               <span class="sig-title">Approved By (Project Manager)</span>
               <div style="margin-top: 10px;">Name: <b>${approvedBy}</b></div>
               <div class="sig-input-line">Signature: </div>
-                </div>
+            </div>
           </div>
         </div>
       </body>
     </html>
     `;
 
-    // Setup environments dynamically 
-    const isProduction = process.env.NODE_ENV === "production";
-    let browser;
+    // 2. Render HTML directly into binary buffer via Puppeteer instance hook
+    const imageBuffer = (await nodeHtmlToImage({
+      html: htmlContent,
+      type: "png",
+      puppeteer: puppeteer, 
+      puppeteerArgs: {
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      },
+    })) as Buffer;
 
-    if (isProduction) {
-      // Vercel deployment options
-      browser = await puppeteerCore.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(CHROMIUM_PACK_URL),
-        headless: true,
-      });
-    } else {
-      // Local testing options (falls back to your local Google Chrome app structure)
-      const localPuppeteer = await import("puppeteer");
-      browser = await localPuppeteer.default.launch({
-        headless: true,
-      });
-    }
-
-    const page = await browser.newPage();
-    await page.setViewport({ width: 940, height: 600 });
-    await page.setContent(htmlContent);
-    
-    // Direct raw binary screenshot generation
-    const imageBuffer = await page.screenshot({ type: "png" }) as Buffer;
-    await browser.close();
-
-    // Send payload out to Telegram
+    // 3. Dispatch payload out to Telegram API configuration endpoints
     const formData = new FormData();
     formData.append("chat_id", chatId);
     
-    const blob = new Blob([imageBuffer], { type: "image/png" });
+    const blob = new Blob([new Uint8Array(imageBuffer)], { type: "image/png" });
     formData.append("photo", blob, "exit-request.png");
     formData.append("caption", `📄 *New Red Cloud Office Exit Form Generated for ${customer}*`);
 
